@@ -5,10 +5,10 @@
 
 ## Learning objectives
 
-- Cloning a project from GitHub to RStudio
+- Clone a project from GitHub to RStudio
 - Knitting R Markdown documents
 - R Markdown and (some) R syntax
-- Version control git and GitHub
+- Understand reproducibility and why it is important
 
 ## References
 
