@@ -1,0 +1,140 @@
+---
+title: "Meet the toolkit: Flint water crisis"
+author: ""
+date: ""
+output: 
+  html_document:
+    toc: true
+    number_sections: false
+    toc_float: true
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = NA)
+```
+
+# Introduction
+
+The data set consists of 271 homes sampled with three water 
+lead contaminant values at designated time points. The lead content is in 
+parts per billion (ppb). Additionally, some location data is given 
+about each home.
+
+To get started, read in the `flint.csv` file using function `read_csv()`.
+
+```{r packages}
+library(tidyverse)
+```
+
+```{r read-data}
+flint <- read_csv("flint.csv")
+```
+
+Let's preview the data with function `glimpse()`
+
+```{r}
+glimpse(flint)
+```
+
+- **id**: sample id number
+- **zip**: zip code in Flint as to the water sample's location
+- **ward**: ward in Flint as to the water sample's location
+- **draw**: water sample at one of three time points
+- **lead**: lead content in parts per billion
+
+# Analysis
+
+## Summary data
+
+#### Part I
+
+Let's see how many samples were taken from each zip code.
+
+```{r}
+flint %>%               # data
+  group_by(zip) %>%     # perform a grouping by zip code
+  count()               # count occurrences
+```
+
+Which zip code had the most samples drawn?
+
+#### Part II
+
+Next, let's look at the mean and median lead contaminant values for each
+zip code and draw combination. We have eight zip codes and samples taken at
+three time points. How many combinations do we have?
+
+```{r}
+flint %>% 
+  group_by(zip, draw) %>% 
+  summarise(mean_pb = mean(lead))
+```
+
+```{r}
+flint %>% 
+  group_by(zip, draw) %>% 
+  summarise(median_pb = median(lead))
+```
+
+How many rows are in each of two above data frames?
+
+#### Part III
+
+Modify the code below to compute the mean and median lead contaminant values
+for zip code 48503 at the first draw. What should you put in for 
+`draw == "-----"`? Don't forget to uncomment the second line of code.
+
+```{r}
+flint %>% 
+  # filter(zip == 48503, draw == "-----") %>% 
+  summarise(mean_pb = mean(lead),
+            median_pb = median(lead))
+```
+
+## Visualizations
+
+Let's make some plots, where we will focus on zip codes 48503, 48504, 48505,
+48506, and 48507. We will restrict our attention to samples with lead values
+less than 1,000 ppb.
+
+```{r}
+flint_focus <- flint %>% 
+  filter(zip %in% 48503:48507, lead < 1000)
+```
+
+Below are side-by-side box plots for the three flushing times in each of the
+five zip codes considered. Add `x` and `y` labels; add a title by inserting
+`title = "title_name"` inside the `labs()` function.
+
+```{r full-plot, fig.width=9}
+ggplot(data = flint_focus, aes(x = factor(zip), y = lead)) +
+  geom_boxplot(aes(fill = factor(draw))) +
+  labs(x = "--------", y = "--------", fill = "Flushing time") +
+  scale_fill_discrete(breaks = c("first", "second", "third"),
+                      labels = c("0 (sec)", "45 (sec)", "120 (sec)")) +
+  coord_flip() +
+  theme_bw()
+```
+
+Add labels for `x`, `y`, a `title`, and `subtitle` to the code below to update
+the corresponding plot.
+
+```{r zoom-plot, fig.width=9}
+ggplot(data = flint_focus, aes(x = factor(zip), y = lead)) +
+  geom_boxplot(aes(fill = factor(draw))) + 
+  labs(x = "--------", y = "--------", fill = "Flushing time",
+       subtitle = "--------") +
+  scale_fill_discrete(breaks = c("first", "second", "third"),
+                      labels = c("0 (sec)", "45 (sec)", "120 (sec)")) +
+  coord_flip(ylim = c(0, 50)) +
+  theme_bw()
+```
+
+What is the difference between the two plots?
+
+# References
+
+1. Langkjaer-Bain, R. (2017), The murky tale of Flint's deceptive water data. 
+   Significance, 14: 16-21.
